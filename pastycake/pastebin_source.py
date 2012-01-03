@@ -16,16 +16,18 @@ class PastebinSource(PasteSource):
 
         for link in soup.findAll("a"):
             app = link["href"]
-
             if not backend.already_visited_url(self.full_url(app)):
                 yield self, app
 
     def get_paste(self, path):
         http = httplib2.Http()
         status, response = http.request(self.full_url(path))
-        # appears to only have one textarea
-        feast = BeautifulSoup(response,
+        try: #wrap parser to avoid malformed error
+            feast = BeautifulSoup(response,
                                 parseOnlyThese=SoupStrainer("textarea"))
+        except: #return a blank which will 
+            feast = ""
+
         return status, feast
 
     def full_url(self, path):
