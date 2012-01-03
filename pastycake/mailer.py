@@ -2,26 +2,31 @@ import sys
 import socket
 import smtplib
 import string
+from pastebin_source import PastebinSource
 
 class Mailer():
     def __init__(self,recv):
         self._recv = recv
 
-    def get_paste_text(url):
-        raise NotImplemented()
+    def get_paste_text(self,url):
+        pb = PastebinSource()
+        status, data = pb.get_paste(url)
+        if data == '':
+            data = "Failed to pull paste data"
+        return data
 
     def sendmail(self,url,matcher):
         sender = "pastycake@" + socket.gethostname()
         recv = self._recv
         subject = "[PastyCake] " + url + " matched " + matcher
-        text = "NT"
+        text = self.get_paste_text(url)
 
         body = string.join((
             "From: %s" % sender,
             "To: %s" % recv,
             "Subject: %s" % subject,
             "",
-            text
+            str(text)
         ), "\r\n")
 
         server = smtplib.SMTP("localhost")

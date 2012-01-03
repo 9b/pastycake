@@ -62,7 +62,7 @@ def fetch(storage, sources, keywords, email, store_match):
                 print '%s matched %s' % (full_url, match.group())
 
                 if email:
-                   email.sendmail(full_url,match.group())
+                   email.sendmail(path,match.group())
 
 
 def main(args=None):
