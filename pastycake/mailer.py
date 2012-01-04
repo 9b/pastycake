@@ -21,13 +21,22 @@ class Mailer():
         subject = "[PastyCake] " + url + " matched " + matcher
         text = self.get_paste_text(url)
 
-        body = string.join((
-            "From: %s" % sender,
-            "To: %s" % recv,
-            "Subject: %s" % subject,
-            "",
-            str(text)
-        ), "\r\n")
+        try:
+            body = string.join((
+                "From: %s" % sender,
+                "To: %s" % recv,
+                "Subject: %s" % subject,
+                "",
+                str(text)
+            ), "\r\n")
+        except:
+            body = string.join((
+                "From: %s" % sender,
+                "To: %s" % recv,
+                "Subject: %s" % subject,
+                "",
+                str("Failed to handle non-ascii code")
+            ), "\r\n")
 
         server = smtplib.SMTP("localhost")
         try:
