@@ -1,3 +1,4 @@
+import time
 import httplib2
 import re
 import sqlite3 as sql
@@ -18,9 +19,9 @@ def clean(val):
     val = re.sub(r'<.*?>', '', val) #remove tags
     return val.strip() #remove leading & trailing whitespace
 
-def save_url(url):
+def save_url(url,matcher):
 	cur = con.cursor()
-	cur.execute("insert into urls(url) values(?)",[url])
+	cur.execute("insert into urls(url,matcher) values(?,?)",[url,matcher])
 	con.commit() 
 
 def check_url(url):
@@ -32,17 +33,25 @@ def check_url(url):
 	else:
 		return True
 
-http = httplib2.Http()
-status, response = http.request('http://pastebin.com/archive')
-product = SoupStrainer("td",{"class":"icon"})
-soup = BeautifulSoup(response,parseOnlyThese=product)
-for link in soup.findAll("a"):
-	app = link["href"]
-	if check_url(app):
-		save_url(app)
-		tmper = base_url + app
-		status, response = http.request(tmper)
-		feast = BeautifulSoup(response,parseOnlyThese=SoupStrainer("textarea")) #appears to only have one textarea
-		m = re.search('|'.join(keywords),str(feast))
-		if m:
-			print tmper + " matched " +  m.group()
+def fetch():
+	http = httplib2.Http()
+	status, response = http.request('http://pastebin.com/archive')	
+	product = SoupStrainer("td",{"class":"icon"})
+	soup = BeautifulSoup(response,parseOnlyThese=product)
+	for link in soup.findAll("a"):
+		app = link["href"]
+		if check_url(app):
+			tmper = base_url + app
+			status, response = http.request(tmper)
+			feast = BeautifulSoup(response,parseOnlyThese=SoupStrainer("textarea")) #appears to only have one textarea
+			m = re.search('|'.join(keywords),str(feast))
+			if m:
+				print tmper + " matched " +  m.group()
+				save_url(app,str(m.group()))
+			else:
+				save_url(app,"")
+
+if __name__ == "__main__":
+	while(1):
+		fetch()
+		time.sleep(5)

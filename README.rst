@@ -12,4 +12,3 @@ Plans
 * Create easy way to add in keywords
 * Replace nesting with generators
 * Add in emailer
-* Daemonize!
