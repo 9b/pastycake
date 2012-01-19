@@ -59,5 +59,4 @@ if __name__ == "__main__":
     init_db()
     while(1):
         fetch()
-        #time.sleep(5)
-        time.sleep(15)
+        time.sleep(5)
