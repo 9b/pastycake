@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import httplib2
 import re
 from BeautifulSoup import BeautifulSoup, SoupStrainer
@@ -8,6 +9,7 @@ base_url = "http://pastebin.com"
 keywords = ['password',
             'hack',
            ]
+_DEFAULT_TRACKER_FILE = 'tracker.txt'
 
 
 def clean(val):
@@ -17,14 +19,14 @@ def clean(val):
     return val.strip()  # remove leading & trailing whitespace
 
 
-def save_url(url):
-    tracker = open("tracker.txt", "a")
+def save_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
+    tracker = open(tracker_file, "a")
     tracker.write(str(url) + "\n")
     tracker.close()
 
 
-def check_url(url):
-    tracker = open("tracker.txt", "r+")
+def check_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
+    tracker = open(tracker_file, "r+")
     lines = tracker.readlines()
 
     for line in lines:
