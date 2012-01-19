@@ -7,8 +7,9 @@ from BeautifulSoup import BeautifulSoup, SoupStrainer
 
 import pastycake.db as db
 
+from pastycake.pastebin_source import PastebinSource
+
 #declare
-base_url = "http://pastebin.com"
 keywords = ['password',
             'hack',
            ]
@@ -29,34 +30,30 @@ def clean(val):
     return val.strip()  # remove leading & trailing whitespace
 
 
-def fetch():
+def fetch(sources):
     global con
 
     http = httplib2.Http()
-    status, response = http.request('http://pastebin.com/archive')
-    product = SoupStrainer("td", {"class": "icon"})
-    soup = BeautifulSoup(response, parseOnlyThese=product)
 
-    for link in soup.findAll("a"):
-        app = link["href"]
+    search_re = re.compile('|'.join(keywords))
 
-        if not db.already_visited_url(con, app):
-            tmper = base_url + app
-            status, response = http.request(tmper)
-            # appears to only have one textarea
-            feast = BeautifulSoup(response,
-                                  parseOnlyThese=SoupStrainer("textarea"))
-            m = re.search('|'.join(keywords), str(feast))
+    for src in sources:
+        for generator, path in src.new_urls(con):
+            status, data = generator.get_paste(path)
+            full_url = generator.full_url(path)
 
-            if m:
-                print tmper + " matched " + m.group()
-                db.save_url(con, app, str(m.group()))
+            match = search_re.search(str(data))
+
+            if match:
+                print full_url + " matched " + match.group()
+                db.save_url(con, full_url, str(match.group()))
             else:
-                db.save_url(con, app, "")
+                db.save_url(con, full_url, "")
 
 
 if __name__ == "__main__":
     init_db()
+    sources = [PastebinSource(), ]
     while(1):
-        fetch()
+        fetch(sources)
         time.sleep(5)
