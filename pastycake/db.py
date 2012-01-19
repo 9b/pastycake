@@ -4,6 +4,7 @@ import sqlite3 as S
 
 
 DEFAULT_DB = 'urls.db'
+_visited_urls = {}
 
 
 def connect_db(path=DEFAULT_DB):
@@ -47,11 +48,15 @@ def save_url(sqlcon, url, matcher):
 
 
 def already_visited_url(sqlcon, url):
+    global _visited_urls
+    if url not in _visited_urls.keys():
         try:
             curs = sqlcon.cursor()
             res = curs.execute('SELECT * FROM urls WHERE url=?', (url,))
             #returns None in case of absence and that gets converted to False
-            return bool(res.fetchone())
+            _visited_urls[url] = bool(res.fetchone())
         except S.Error as e:
             print >> stderr, "failed to check url: %s" % e
             return False
+
+    return _visited_urls.get(url)
