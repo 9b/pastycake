@@ -20,19 +20,18 @@ def clean(val):
 
 
 def save_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
-    tracker = open(tracker_file, "a")
-    tracker.write(str(url) + "\n")
-    tracker.close()
+    with open(tracker_file, 'a') as tracker:
+        tracker.write(str(url) + "\n")
 
 
 def check_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
-    tracker = open(tracker_file, "r+")
-    lines = tracker.readlines()
+    with open(tracker_file, 'r+') as tracker:
+        lines = tracker.readlines()
 
-    for line in lines:
-        m = re.search(url, line)
-        if m:
-            return False
+        for line in lines:
+            m = re.search(url, line)
+            if m:
+                return False
     return True
 
 
