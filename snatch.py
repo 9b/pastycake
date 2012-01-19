@@ -10,6 +10,7 @@ keywords = ['password',
             'hack',
            ]
 _DEFAULT_TRACKER_FILE = 'tracker.txt'
+_tracked_urls = set()
 
 
 def clean(val):
@@ -20,19 +21,21 @@ def clean(val):
 
 
 def save_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
+    global _tracked_urls
+    _tracked_urls.add(url)
+
     with open(tracker_file, 'a') as tracker:
         tracker.write(str(url) + "\n")
 
 
 def check_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
-    with open(tracker_file, 'r+') as tracker:
-        lines = tracker.readlines()
+    global _tracked_urls
 
-        for line in lines:
-            m = re.search(url, line)
-            if m:
-                return False
-    return True
+    if not _tracked_urls:
+        with open(tracker_file, 'r+') as tracker:
+            _tracked_urls = set([_.rstrip() for _ in tracker.readlines()])
+
+    return url in _tracked_urls
 
 
 http = httplib2.Http()
