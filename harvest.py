@@ -32,14 +32,11 @@ def save_url(url, matcher):
     con.commit()
 
 
-def check_url(url):
+def already_visited_url(url):
     cur = con.cursor()
     cur.execute("select * from urls where url=?", [url])
-    result = cur.fetchone()
-    if result:
-        return False
-    else:
-        return True
+    #fetchone() returns None if no result and that gets converted to False
+    return bool(cur.fetchone())
 
 
 def fetch():
@@ -49,7 +46,7 @@ def fetch():
     soup = BeautifulSoup(response, parseOnlyThese=product)
     for link in soup.findAll("a"):
         app = link["href"]
-        if check_url(app):
+        if not already_visited_url(app):
             tmper = base_url + app
             status, response = http.request(tmper)
             # appears to only have one textarea

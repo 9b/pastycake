@@ -28,7 +28,7 @@ def save_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
         tracker.write(str(url) + "\n")
 
 
-def check_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
+def already_visited_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
     global _tracked_urls
 
     if not _tracked_urls:
@@ -46,7 +46,7 @@ soup = BeautifulSoup(response, parseOnlyThese=product)
 for link in soup.findAll("a"):
     app = link["href"]
 
-    if check_url(app):
+    if not already_visited_url(app):
         save_url(app)
         tmper = base_url + app
         status, response = http.request(tmper)
