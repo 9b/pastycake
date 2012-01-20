@@ -16,5 +16,5 @@ Files
 Plans
 =====
 * Create easy way to add in keywords
-* Replace nesting with generators
+* Replace nesting with generators (done)
 * Add in emailer
