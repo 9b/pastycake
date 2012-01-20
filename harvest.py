@@ -1,57 +1,59 @@
 import time
 import httplib2
 import re
-import sqlite3 as sql
+import sys
+
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 
-#declare
-db = "urls.db"
-base_url = "http://pastebin.com"
-keywords = ['password','hack']
+import pastycake.db as db
 
-try:
-	con = sql.connect(db)
-except:
-	print "Could not connect to " + db
+from pastycake.pastebin_source import PastebinSource
+
+#declare
+keywords = ['password',
+            'hack',
+           ]
+
+con = None
+
+
+def init_db():
+    global con
+    con = db.connect_db() or sys.exit(1)
+    db.create_tables(con)
+
 
 def clean(val):
-    if type(val) is not str: val = str(val)
-    val = re.sub(r'<.*?>', '', val) #remove tags
-    return val.strip() #remove leading & trailing whitespace
+    if type(val) is not str:
+        val = str(val)
+    val = re.sub(r'<.*?>', '', val)  # remove tags
+    return val.strip()  # remove leading & trailing whitespace
 
-def save_url(url,matcher):
-	cur = con.cursor()
-	cur.execute("insert into urls(url,matcher) values(?,?)",[url,matcher])
-	con.commit() 
 
-def check_url(url):
-	cur = con.cursor()
-	cur.execute("select * from urls where url=?",[url])
-	result = cur.fetchone()
-	if result:
-		return False
-	else:
-		return True
+def fetch(sources):
+    global con
 
-def fetch():
-	http = httplib2.Http()
-	status, response = http.request('http://pastebin.com/archive')	
-	product = SoupStrainer("td",{"class":"icon"})
-	soup = BeautifulSoup(response,parseOnlyThese=product)
-	for link in soup.findAll("a"):
-		app = link["href"]
-		if check_url(app):
-			tmper = base_url + app
-			status, response = http.request(tmper)
-			feast = BeautifulSoup(response,parseOnlyThese=SoupStrainer("textarea")) #appears to only have one textarea
-			m = re.search('|'.join(keywords),str(feast))
-			if m:
-				print tmper + " matched " +  m.group()
-				save_url(app,str(m.group()))
-			else:
-				save_url(app,"")
+    http = httplib2.Http()
+
+    search_re = re.compile('|'.join(keywords))
+
+    for src in sources:
+        for generator, path in src.new_urls(con):
+            status, data = generator.get_paste(path)
+            full_url = generator.full_url(path)
+
+            match = search_re.search(str(data))
+
+            if match:
+                print full_url + " matched " + match.group()
+                db.save_url(con, full_url, str(match.group()))
+            else:
+                db.save_url(con, full_url, "")
+
 
 if __name__ == "__main__":
-	while(1):
-		fetch()
-		time.sleep(5)
+    init_db()
+    sources = [PastebinSource(), ]
+    while(1):
+        fetch(sources)
+        time.sleep(5)
