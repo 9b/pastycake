@@ -34,8 +34,6 @@ def clean(val):
 def fetch(sources):
     global con
 
-    http = httplib2.Http()
-
     search_re = re.compile('|'.join(keywords))
 
     for src in sources:
