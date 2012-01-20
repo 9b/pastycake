@@ -1,7 +1,10 @@
 from __future__ import with_statement
-import httplib2
+
 import re
-from BeautifulSoup import BeautifulSoup, SoupStrainer
+import sys
+
+from pastycake.pastebin_source import PastebinSource
+from pastycake.text_backend import TextBackend
 
 
 #declare
@@ -9,8 +12,6 @@ base_url = "http://pastebin.com"
 keywords = ['password',
             'hack',
            ]
-_DEFAULT_TRACKER_FILE = 'tracker.txt'
-_tracked_urls = set()
 
 
 def clean(val):
@@ -20,40 +21,28 @@ def clean(val):
     return val.strip()  # remove leading & trailing whitespace
 
 
-def save_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
-    global _tracked_urls
-    _tracked_urls.add(url)
+def fetch(tracker, sources):
+    search_re = re.compile('|'.join(keywords))
 
-    with open(tracker_file, 'a') as tracker:
-        tracker.write(str(url) + "\n")
+    for src in sources:
+        for generator, path in src.new_urls(tracker):
+            status, data = generator.get_paste(path)
+            full_url = generator.full_url(path)
 
+            match = search_re.search(str(data))
 
-def already_visited_url(url, tracker_file=_DEFAULT_TRACKER_FILE):
-    global _tracked_urls
+            tracker.save_url(full_url)
 
-    if not _tracked_urls:
-        with open(tracker_file, 'r+') as tracker:
-            _tracked_urls = set([_.rstrip() for _ in tracker.readlines()])
-
-    return url in _tracked_urls
+            if match:
+                print full_url + " matched " + match.group()
 
 
-http = httplib2.Http()
-status, response = http.request('http://pastebin.com/archive')
-product = SoupStrainer("td", {"class": "icon"})
-soup = BeautifulSoup(response, parseOnlyThese=product)
+if __name__ == '__main__':
+    tracker = TextBackend()
+    tracker.connect()
+    tracker.connected() or sys.exit(1)
 
-for link in soup.findAll("a"):
-    app = link["href"]
+    sources = [PastebinSource(),
+              ]
 
-    if not already_visited_url(app):
-        save_url(app)
-        tmper = base_url + app
-        status, response = http.request(tmper)
-        # appears to only have one textarea
-        feast = BeautifulSoup(response,
-                              parseOnlyThese=SoupStrainer("textarea"))
-        m = re.search('|'.join(keywords), str(feast))
-
-        if m:
-            print tmper + " matched " + m.group()
+    fetch(tracker, sources)

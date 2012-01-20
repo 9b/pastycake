@@ -16,8 +16,8 @@ class SqliteBackend(StorageBackend):
             if url not in self._visited_urls:
                 try:
                     curs = self._con.cursor()
-                    res = curs.execute('SELECT * FROM urls WHERE url=?', (url,))
-                    #returns None in case of absence and that gets converted to False
+                    res = curs.execute('SELECT * FROM urls WHERE url=?',
+                                       (url,))
                     val = res.fetchone()
                     if val:
                         self._visited_urls.add(val)

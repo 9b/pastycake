@@ -2,27 +2,14 @@ import time
 import re
 import sys
 
-#from BeautifulSoup import BeautifulSoup, SoupStrainer
-
-from pastycake.sqlite_backend import SqliteBackend
-
 from pastycake.pastebin_source import PastebinSource
 from pastycake.pastie_source import PastieSource
+from pastycake.sqlite_backend import SqliteBackend
 
 #declare
 keywords = ['password',
             'hack',
            ]
-
-db = None
-
-
-def init_db():
-    global db
-    db = SqliteBackend()
-    db.connect()
-    db.connected() or sys.exit(1)
-
 
 def clean(val):
     if type(val) is not str:
@@ -31,9 +18,7 @@ def clean(val):
     return val.strip()  # remove leading & trailing whitespace
 
 
-def fetch(sources):
-    global db
-
+def fetch(db, sources):
     search_re = re.compile('|'.join(keywords))
 
     for src in sources:
@@ -49,10 +34,13 @@ def fetch(sources):
 
 
 if __name__ == "__main__":
-    init_db()
+    db = SqliteBackend()
+    db.connect()
+    db.connected() or sys.exit(1)
+
     sources = [PastebinSource(),
                #PastieSource(),
               ]
     while(1):
-        fetch(sources)
+        fetch(db, sources)
         time.sleep(5)
