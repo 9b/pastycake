@@ -6,28 +6,29 @@ from .storage_backend import StorageBackend
 class TextBackend(StorageBackend):
     DEFAULT_FILE = 'tracker.txt'
 
-    def __init__(self):
+    def __init__(self, filename=None):
         self._connected = False
         self._tracked_urls = set()
+        self._filename = filename or self.DEFAULT_FILE
 
-    def already_visited_url(self, url, tracker_file=DEFAULT_FILE):
+    def already_visited_url(self, url):
         if not self._tracked_urls:
-            with open(tracker_file, 'r+') as tracker:
+            with open(self._filename, 'r+') as tracker:
                 self._tracked_urls = set([_.rstrip() for _ in
                                           tracker.readlines()])
 
         return url in self._tracked_urls
 
-    def save_url(self, url, tracker_file=DEFAULT_FILE):
+    def save_url(self, url, *args):
         self._tracked_urls.add(url)
 
-        with open(tracker_file, 'a') as tracker:
+        with open(self._filename, 'a') as tracker:
             tracker.write(str(url) + "\n")
 
-    def connect(self, filename=DEFAULT_FILE):
+    def connect(self):
         fh = None
         try:
-            fh = open(filename, 'a+')
+            fh = open(self._filename, 'a+')
             self._connected = True
         except Exception as e:
             self._connected = False

@@ -8,9 +8,10 @@ from .storage_backend import StorageBackend
 class SqliteBackend(StorageBackend):
         DEFAULT_DB = 'urls.db'
 
-        def __init__(self):
+        def __init__(self, filename=None):
             self._visited_urls = set()
             self._con = None
+            self._filename = filename or self.DEFAULT_DB
 
         def already_visited_url(self, url):
             if url not in self._visited_urls:
@@ -40,9 +41,9 @@ class SqliteBackend(StorageBackend):
 
             return True
 
-        def connect(self, path=DEFAULT_DB):
+        def connect(self):
             try:
-                self._con = S.connect(path)
+                self._con = S.connect(self._filename)
                 self._create_tables()
             except S.Error as e:
                 print >> stderr, "failed to connect to db: %s" % e
