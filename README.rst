@@ -1,6 +1,12 @@
 Purpose
 =======
-Search through Pastebin.com for interesting pastes based on keywords
+Search through Paste services such as pastebin.com for interesting pastes
+based on keywords
+
+Supported Pastes
+================
+* pastebin.com
+* pastie.org
 
 Files
 =====
@@ -10,5 +16,5 @@ Files
 Plans
 =====
 * Create easy way to add in keywords
-* Replace nesting with generators
+* Replace nesting with generators (done)
 * Add in emailer

@@ -5,9 +5,12 @@ class PasteSource:
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def new_urls(self, dbcon):
+    def new_urls(self, backend):
         '''
-        must be implemented as generator yielding new, unvisited URLs
+        @param backend an instance of an class that is an implementation
+        of the StorageBackend abc.
+
+        Must be implemented as generator yielding new, unvisited URLs
         as pairs of (self, path)
 
         IMPORTANT: requests to db.already_visited_url MUST be made with
