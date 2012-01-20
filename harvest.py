@@ -3,11 +3,12 @@ import httplib2
 import re
 import sys
 
-from BeautifulSoup import BeautifulSoup, SoupStrainer
+#from BeautifulSoup import BeautifulSoup, SoupStrainer
 
 import pastycake.db as db
 
 from pastycake.pastebin_source import PastebinSource
+from pastycake.pastie_source import PastieSource
 
 #declare
 keywords = ['password',
@@ -53,7 +54,9 @@ def fetch(sources):
 
 if __name__ == "__main__":
     init_db()
-    sources = [PastebinSource(), ]
+    sources = [PastebinSource(),
+               #PastieSource(),
+              ]
     while(1):
         fetch(sources)
         time.sleep(5)
