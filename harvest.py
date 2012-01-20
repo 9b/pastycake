@@ -1,11 +1,10 @@
 import time
-import httplib2
 import re
 import sys
 
 #from BeautifulSoup import BeautifulSoup, SoupStrainer
 
-import pastycake.db as db
+from pastycake.sqlite_backend import SqliteBackend
 
 from pastycake.pastebin_source import PastebinSource
 from pastycake.pastie_source import PastieSource
@@ -15,13 +14,14 @@ keywords = ['password',
             'hack',
            ]
 
-con = None
+db = None
 
 
 def init_db():
-    global con
-    con = db.connect_db() or sys.exit(1)
-    db.create_tables(con)
+    global db
+    db = SqliteBackend()
+    db.connect()
+    db.connected() or sys.exit(1)
 
 
 def clean(val):
@@ -32,12 +32,12 @@ def clean(val):
 
 
 def fetch(sources):
-    global con
+    global db
 
     search_re = re.compile('|'.join(keywords))
 
     for src in sources:
-        for generator, path in src.new_urls(con):
+        for generator, path in src.new_urls(db):
             status, data = generator.get_paste(path)
             full_url = generator.full_url(path)
 
@@ -45,9 +45,7 @@ def fetch(sources):
 
             if match:
                 print full_url + " matched " + match.group()
-                db.save_url(con, full_url, str(match.group()))
-            else:
-                db.save_url(con, full_url, "")
+            db.save_url(full_url, match.group() if match else match)
 
 
 if __name__ == "__main__":

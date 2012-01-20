@@ -1,0 +1,70 @@
+from sys import stderr
+
+import sqlite3 as S
+
+from .storage_backend import StorageBackend
+
+
+class SqliteBackend(StorageBackend):
+        DEFAULT_DB = 'urls.db'
+
+        def __init__(self):
+            self._visited_urls = set()
+            self._con = None
+
+        def already_visited_url(self, url):
+            if url not in self._visited_urls:
+                try:
+                    curs = self._con.cursor()
+                    res = curs.execute('SELECT * FROM urls WHERE url=?', (url,))
+                    #returns None in case of absence and that gets converted to False
+                    val = res.fetchone()
+                    if val:
+                        self._visited_urls.add(val)
+                except S.Error as e:
+                    print >> stderr, "failed to check url: %s" % e
+                    return False
+            return url in self._visited_urls
+
+        def save_url(self, url, match_text=None):
+            match_text = match_text or ''
+            try:
+                curs = self._con.cursor()
+                curs.execute('INSERT INTO urls(url, matcher) VALUES(?, ?)',
+                            (url, match_text))
+                self._con.commit()
+                self._visited_urls.add(url)
+            except S.Error as e:
+                print >> stderr, "failed to save url: %s" % e
+                return False
+
+            return True
+
+        def connect(self, path=DEFAULT_DB):
+            try:
+                self._con = S.connect(path)
+                self._create_tables()
+            except S.Error as e:
+                print >> stderr, "failed to connect to db: %s" % e
+                self._con = None
+
+        def connected(self):
+            return bool(self._con)
+
+        def _create_tables(self):
+            _URL_TABLE = '''
+            CREATE TABLE urls (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                url TEXT,
+                matcher TEXT,
+                viewed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            '''
+
+            try:
+                curs = self._con.cursor()
+                curs.execute(_URL_TABLE)
+                self._con.commit()
+            except S.OperationalError:
+                #table already exists or we failed to lock the db
+                pass

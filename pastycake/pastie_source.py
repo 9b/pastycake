@@ -9,7 +9,7 @@ from .db import already_visited_url
 class PastieSource(PasteSource):
     baseurl = 'http://pastie.org'
 
-    def new_urls(self, dbcon):
+    def new_urls(self, backend):
         http = httplib2.Http()
         status, response = http.request('http://pastie.org/pastes')
         product = SoupStrainer("div", {"class": "pastePreview"})
@@ -18,7 +18,7 @@ class PastieSource(PasteSource):
         for link in soup.findAll("a"):
             app = link["href"]
 
-            if not already_visited_url(dbcon, app):
+            if not backend.already_visited_url(app):
                 yield self, app
 
     def get_paste(self, path):

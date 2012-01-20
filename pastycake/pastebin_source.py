@@ -3,13 +3,12 @@ import httplib2
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 
 from .pastesource import PasteSource
-from .db import already_visited_url
 
 
 class PastebinSource(PasteSource):
     baseurl = 'http://pastebin.com'
 
-    def new_urls(self, dbcon):
+    def new_urls(self, backend):
         http = httplib2.Http()
         status, response = http.request('http://pastebin.com/archive')
         product = SoupStrainer("td", {"class": "icon"})
@@ -18,7 +17,7 @@ class PastebinSource(PasteSource):
         for link in soup.findAll("a"):
             app = link["href"]
 
-            if not already_visited_url(dbcon, self.full_url(app)):
+            if not backend.already_visited_url(self.full_url(app)):
                 yield self, app
 
     def get_paste(self, path):
