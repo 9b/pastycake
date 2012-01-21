@@ -8,7 +8,7 @@ from pastycake.text_backend import TextBackend
 from pastycake.pastebin_source import PastebinSource
 
 
-common_keywords = [
+DEFAULT_KEYWORDS = [
     'password',
     'hack',
 ]
@@ -16,7 +16,12 @@ common_keywords = [
 
 def _parse_opts(args):
     opt_parser = argparse.ArgumentParser(
-                                        description='harvest or snatch pastes')
+                                    description='harvest or snatch pastes')
+    opt_parser.add_argument('-k', '--use_keyfile', nargs=1, metavar='KWFILE',
+                            dest='kwfile', type=argparse.FileType('r'),
+            help='read the keywords from KWFILE. if not given as an \
+                  argument, then the built-in DEFAULT_KEYWORDS will be used.'
+    )
     opt_parser.add_argument('-o', '--output', metavar='FILENAME',
                             dest='filename', action='store', default=None,
                             type=str,
@@ -29,6 +34,10 @@ def _parse_opts(args):
                         help='additional keywords to search for')
 
     return opt_parser.parse_args(args)
+
+
+def _read_keywords(fhandle):
+    return [_.rstrip() for _ in fhandle]
 
 
 def fetch(storage, sources, keywords, store_match):
@@ -56,9 +65,18 @@ def main(args=None):
             sys.exit(1)
         return storage
 
-    opts = _parse_opts(args)
+    try:
+        opts = _parse_opts(args)
+    except IOError as e:
+        print >> sys.stderr, "option error: %s" % e
+        sys.exit(1)
 
-    keywords = common_keywords + opts.add_keywords
+    keywords = None
+    if opts.kwfile:
+        keywords = _read_keywords(opts.kwfile[0])
+    else:
+        keywords = DEFAULT_KEYWORDS
+
     sources = [
         PastebinSource(),
     ]
