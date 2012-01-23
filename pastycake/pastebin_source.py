@@ -1,4 +1,7 @@
 import httplib2
+import sys
+
+from HTMLParser import HTMLParseError
 
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 
@@ -25,7 +28,9 @@ class PastebinSource(PasteSource):
         try: #wrap parser to avoid malformed error
             feast = BeautifulSoup(response,
                                 parseOnlyThese=SoupStrainer("textarea"))
-        except: #return a blank which will 
+        except HTMLParseError as e: #return a blank which will 
+            print >> sys.stderr, "failed on get_paste for path '%s': %s" % (
+                    path, e)
             feast = ""
 
         return status, feast
