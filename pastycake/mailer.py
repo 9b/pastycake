@@ -2,7 +2,7 @@ import smtplib
 import socket
 import sys
 
-from email.mime.text import MimeText
+from email.mime.text import MIMEText
 
 from pastebin_source import PastebinSource
 
@@ -30,7 +30,7 @@ class Mailer(object):
         except:
             text = ''
 
-        msg = MimeText(text)
+        msg = MIMEText(text)
         msg['subject'] = subject
         msg['From'] = sender
         msg['To'] = recv
