@@ -3,6 +3,8 @@ import re
 import sys
 import time
 
+import louie as L
+
 from pastycake.sqlite_backend import SqliteBackend
 from pastycake.text_backend import TextBackend
 from pastycake.pastebin_source import PastebinSource
@@ -45,7 +47,7 @@ def _read_keywords(fhandle):
     return [_.rstrip() for _ in fhandle]
 
 
-def fetch(storage, sources, keywords, email, store_match):
+def fetch(storage, sources, keywords, store_match):
     search_re = re.compile('|'.join(keywords))
 
     for src in sources:
@@ -55,14 +57,13 @@ def fetch(storage, sources, keywords, email, store_match):
 
             match = search_re.search(str(data))
 
-            storage.save_url(full_url, match.group() if match and store_match
-                             else match)
+            storage.save_url(full_url,
+                             match.group() if match and store_match else None)
 
             if match:
                 print '%s matched %s' % (full_url, match.group())
-
-                if email:
-                   email.sendmail(path,match.group())
+                L.send('match', generator, storage, match=match.group(),
+                       url=full_url, data=data)
 
 
 def main(args=None):
@@ -90,18 +91,19 @@ def main(args=None):
         PastieSource()
     ]
 
-    email = None
+    listeners = []
+
     if opts.alert_email:
-        email = Mailer(opts.alert_email)
+        listeners += [ Mailer(opts.alert_email), ]
 
     if opts.gather_mode == 'harvest':
         while True:
             fetch(_backend_or_exit(SqliteBackend(opts.filename)),
-                  sources, keywords, email, store_match=True)
+                  sources, keywords, store_match=True)
             time.sleep(5)
     elif opts.gather_mode == 'snatch':
         fetch(_backend_or_exit(TextBackend(opts.filename)),
-              sources, keywords, email,store_match=False)
+              sources, keywords, store_match=False)
     else:
         print >> sys.stderr, "unknown gathering mode %s" % opts.gather_mode
         sys.exit(1)
