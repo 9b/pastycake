@@ -24,6 +24,8 @@ setup(
     name='pastycake',
     packages=['pastycake'],
     requires = [
+        'BeautifulSoup',
+        'httplib2',
         'Louie',
     ],
     scripts=['gather.py', 'harvest.py', 'snatch.py'],
