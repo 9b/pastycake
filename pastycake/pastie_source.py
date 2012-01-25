@@ -3,7 +3,7 @@ import httplib2
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 
 from .pastesource import PasteSource
-from .db import already_visited_url
+#from .db import already_visited_url
 
 
 class PastieSource(PasteSource):

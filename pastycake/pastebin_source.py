@@ -25,10 +25,10 @@ class PastebinSource(PasteSource):
     def get_paste(self, path):
         http = httplib2.Http()
         status, response = http.request(self.full_url(path))
-        try: #wrap parser to avoid malformed error
+        try:  # wrap parser to avoid malformed error
             feast = BeautifulSoup(response,
                                 parseOnlyThese=SoupStrainer("textarea"))
-        except HTMLParseError as e: #return a blank which will 
+        except HTMLParseError as e:  # return a blank which will
             print >> sys.stderr, "failed on get_paste for path '%s': %s" % (
                     path, e)
             feast = ""

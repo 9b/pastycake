@@ -1,1 +1,6 @@
 *.pyc
+*.swp
+MANIFEST
+dist/
+build/
+kwords
