@@ -35,9 +35,9 @@ def _parse_opts(args):
     )
     opt_parser.add_argument('add_keywords', metavar='KEYWORDS', nargs='*',
                         help='additional keywords to search for')
-    opt_parser.add_argument('-a','--alert_email', metavar='EMAIL', type=str,
-                            dest='alert_email', help='email to send alerts to', 
-                            default=None, action='store'                       
+    opt_parser.add_argument('-a', '--alert_email', metavar='EMAIL', type=str,
+                            dest='alert_email', help='email to send alerts to',
+                            default=None, action='store'
     )
 
     return opt_parser.parse_args(args)
@@ -94,7 +94,7 @@ def main(args=None):
     listeners = []
 
     if opts.alert_email:
-        listeners += [ Mailer(opts.alert_email), ]
+        listeners += [Mailer(opts.alert_email), ]
 
     if opts.gather_mode == 'harvest':
         while True:
