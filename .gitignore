@@ -4,3 +4,5 @@ MANIFEST
 dist/
 build/
 kwords
+__pycache__/
+.tox/
