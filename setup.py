@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     author='b9',
     author_email='brandon@b9plus.com',
-    classifiers= [
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
@@ -23,7 +23,7 @@ setup(
     description='scan pastes for interesting stuff',
     name='pastycake',
     packages=['pastycake'],
-    requires = [
+    requires=[
         'httplib2',
         'Louie',
         'lxml',
