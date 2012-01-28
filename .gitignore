@@ -6,3 +6,6 @@ build/
 kwords
 __pycache__/
 .tox/
+tracker.txt
+urls.db
+tox.ini
