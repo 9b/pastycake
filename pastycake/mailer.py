@@ -18,7 +18,7 @@ class Mailer(object):
     def _handle_match(self, *args, **kwargs):
         self.sendmail(url=kwargs.get('url', ''),
                       matcher=kwargs.get('match', ''),
-                      data = kwargs.get('data', ''))
+                      data=kwargs.get('data', ''))
 
     def sendmail(self, url, matcher, data):
         sender = self._sender or "pastycake@" + socket.gethostname()
