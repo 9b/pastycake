@@ -1,4 +1,5 @@
 import argparse
+import random
 import re
 import sys
 import time
@@ -53,6 +54,13 @@ def fetch(storage, sources, keywords, store_match):
     for src in sources:
         for generator, path in src.new_urls(storage):
             status, data = generator.get_paste(path)
+
+            #if 5xx or 4xx
+            if status['status'][0] in ('4', '5'):
+                #TODO better handling of timeouts
+                print >> sys.stderr, "%s. skipping" % status['status']
+                continue
+
             full_url = generator.full_url(path)
 
             match = search_re.search(str(data))
@@ -100,7 +108,7 @@ def main(args=None):
         while True:
             fetch(_backend_or_exit(SqliteBackend(opts.filename)),
                   sources, keywords, store_match=True)
-            time.sleep(5)
+            time.sleep(random.randint(5, 10))
     elif opts.gather_mode == 'snatch':
         fetch(_backend_or_exit(TextBackend(opts.filename)),
               sources, keywords, store_match=False)
