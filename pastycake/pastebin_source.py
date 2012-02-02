@@ -19,7 +19,11 @@ class PastebinSource(PasteSource):
     def get_paste(self, path):
         url = 'http://pastebin.com/raw.php?i=' + path[1:]
         http = httplib2.Http()
-        return http.request(url)
+        try:
+            res = http.request(url)
+        except AttributeError as e:
+            res = ({'status': '503'}, '')
+        return res
 
     def full_url(self, path):
         return self.baseurl + path
