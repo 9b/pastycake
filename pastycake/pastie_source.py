@@ -19,7 +19,11 @@ class PastieSource(PasteSource):
 
     def get_paste(self, path):
         http = httplib2.Http()
-        return http.request(path + '/text')
+        try:
+            res = http.request(path + '/text')
+        except AttributeError as e:
+            res = ({'status': '503'}, '')
+        return res
 
     def full_url(self, path):
         return path
