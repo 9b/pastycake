@@ -21,6 +21,14 @@ setup(
         "Topic :: Text Processing :: Filters"
     ],
     description='scan pastes for interesting stuff',
+    entry_points = {
+        'pastycake': [
+            'sources:Pastebin = pastycake.pastebin_source:PastebinSource',
+            'sources:Pastie = pastycake.pastie_source:PastieSource',
+            'storage:Sqlite = pastycake.sqlite_backend:SqliteBackend',
+            'storage:Text = pastycake.text_backend:TextBackend',
+        ],
+    },
     name='pastycake',
     packages=['pastycake'],
     requires=[
