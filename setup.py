@@ -1,4 +1,25 @@
+from sys import version_info
+
 from distutils.core import setup
+
+
+_ALWAYS_REQUIRED_PACKS = [
+    'httplib2',
+    'Louie',
+    'lxml',
+]
+
+
+def _required_packages():
+    res = _ALWAYS_REQUIRED_PACKS
+    vers = version_info[:2]
+
+    # argparse is part of the stdlib in Python2.x >= 2.7 and Python3.x >= 3.2
+    if vers < (2, 7) or (3, 0) <= vers < (3, 2):
+        res.append('argparse')
+
+    return res
+
 
 setup(
     author='b9',
@@ -23,11 +44,7 @@ setup(
     description='scan pastes for interesting stuff',
     name='pastycake',
     packages=['pastycake'],
-    requires=[
-        'httplib2',
-        'Louie',
-        'lxml',
-    ],
+    requires=_required_packages(),
     scripts=['gather.py', 'harvest.py', 'snatch.py'],
     url='http://www.gihub.com/9b/pastycake',
     version='0.1',
