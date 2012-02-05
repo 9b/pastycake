@@ -42,7 +42,7 @@ setup(
         "Topic :: Text Processing :: Filters"
     ],
     description='scan pastes for interesting stuff',
-    entry_points = {
+    entry_points={
         'pastycake': [
             'sources:Pastebin = pastycake.pastebin_source:PastebinSource',
             'sources:Pastie = pastycake.pastie_source:PastieSource',
