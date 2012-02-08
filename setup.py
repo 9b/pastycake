@@ -43,17 +43,27 @@ setup(
     ],
     description='scan pastes for interesting stuff',
     entry_points={
+        'console_scripts': [
+            'pastycake-snatch = pastycake.gather:snatch',
+            'pastycake-harvest = pastycake.gather:harvest',
+            'pastycake = pastycake.gather:main',
+        ],
         'pastycake': [
             'sources:Pastebin = pastycake.pastebin_source:PastebinSource',
             'sources:Pastie = pastycake.pastie_source:PastieSource',
             'storage:Sqlite = pastycake.sqlite_backend:SqliteBackend',
             'storage:Text = pastycake.text_backend:TextBackend',
+            'notify:Cli = pastycake.cli_notifier:CliNotifier',
+            'notify:Mail = pastycake.mailer:Mailer',
         ],
+        'pastycake.ext': [
+            'storage:MongoDB = pastycake.mongodb_backend:MongoBackend',
+        ]
     },
     name='pastycake',
     packages=['pastycake'],
     requires=_required_packages(),
-    scripts=['gather.py', 'harvest.py', 'snatch.py'],
+    #scripts=['gather.py', 'harvest.py', 'snatch.py'],
     url='http://www.gihub.com/9b/pastycake',
     version='0.1',
 )

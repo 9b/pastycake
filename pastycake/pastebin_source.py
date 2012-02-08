@@ -8,6 +8,9 @@ from .pastesource import PasteSource
 class PastebinSource(PasteSource):
     baseurl = 'http://pastebin.com'
 
+    def __init__(self, *args, **kwargs):
+        pass
+
     def new_urls(self, backend):
         doc = parse('http://pastebin.com/archive').getroot()
 

@@ -6,10 +6,10 @@ import louie as L
 
 from email.mime.text import MIMEText
 
-from pastebin_source import PastebinSource
+from .notifier import Notifier
 
 
-class Mailer(object):
+class Mailer(Notifier):
     def __init__(self, recv, sender=None):
         self._recv = recv
         self._sender = sender
