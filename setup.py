@@ -63,7 +63,6 @@ setup(
     name='pastycake',
     packages=['pastycake'],
     requires=_required_packages(),
-    #scripts=['gather.py', 'harvest.py', 'snatch.py'],
     url='http://www.gihub.com/9b/pastycake',
     version='0.1',
 )
