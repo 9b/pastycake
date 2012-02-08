@@ -59,8 +59,8 @@ def harvest(conf=None):
         sys.argv = sys.argv[0] + ['harvest'] + sys.argv[1:]
         return main()
     while True:
-       fetch(conf)
-       time.sleep(random.randint(5, 15))
+        fetch(conf)
+        time.sleep(random.randint(5, 15))
 
 
 def snatch(conf=None):
@@ -68,5 +68,3 @@ def snatch(conf=None):
         sys.argv = sys.argv[0] + ['snatch'] + sys.argv[1:]
         return main()
     fetch(conf, False)
-
-
