@@ -8,6 +8,9 @@ from .pastesource import PasteSource
 class PastieSource(PasteSource):
     baseurl = 'http://pastie.org'
 
+    def __init__(self, *args, **kwargs):
+        pass
+
     def new_urls(self, backend):
         doc = parse('http://pastie.org/pastes').getroot()
 

@@ -1,0 +1,15 @@
+Installing pastycake
+====================
+
+    python setup.py build sdist
+    pip install dist/pastycake-<version>.tar.gz
+
+You can also use ``easy_install`` instead of ``pip``, but you should prefer
+``pip`` as it offers some features that ``easy_install`` is lacking, such as
+the ability to uninstall.
+
+Important
+---------
+
+``python setup.py install`` will *not* work due to idiosyncracies with python's
+packaging system(s).
