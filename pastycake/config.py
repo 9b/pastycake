@@ -24,11 +24,11 @@ def _read_keywords(fhandle):
 
 def load_ep_object(epname, section_name=None):
     def _do_load(package, section_name, epname):
-        print >> sys.stderr, section_name, epname
         try:
             return load_entry_point(package, section_name, epname)
         except ImportError as e:
-            print >> sys.stderr, e
+            print >> sys.stderr, 'failed to load entry point %s: %s' % (epname,
+                                                                        e)
             return None
 
     if not section_name:
@@ -147,7 +147,6 @@ class Config(dict):
 
                     obj_opts = _map_section(p, opt) if p.has_section(opt) \
                                                     else {}
-                    print tmp_obj
                     tmp.append(tmp_obj(obj_opts))
 
                 assert(len(tmp))
