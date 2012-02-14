@@ -27,13 +27,15 @@ def _fetch_one(generator, path, keywords, storage, store_match):
         else:
             match = re.search(kw, data)
 
-        storage.save_url(full_url,
-                            match.group() if match and store_match else None)
         if match:
             L.send('match', generator, storage, match=match.group(),
                     url=full_url, data=data)
+            if store_match:
+                storage.save_url(full_url, match.group())
             # stop after the first match
-            return
+            break
+    if not match and store_match:
+        storage.save_url(full_url, None)
 
 
 #def fetch(storage, sources, keywords, store_match):
