@@ -57,12 +57,16 @@ setup(
             'notify:Mail = pastycake.mailer:Mailer',
         ],
         'pastycake.ext': [
-            'storage:MongoDB = pastycake.mongodb_backend:MongoBackend',
+            'storage:MongoDB = pastycake.mongodb_backend:MongoBackend [MongoDB]',
         ]
+    },
+    extras_require={
+        'MongoDB': ['pymongo'],
     },
     name='pastycake',
     packages=['pastycake'],
     requires=_required_packages(),
     url='http://www.gihub.com/9b/pastycake',
+    use_2to3=True,
     version='0.1',
 )
