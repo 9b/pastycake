@@ -68,7 +68,7 @@ def main(args=None):
 
 def harvest(conf=None):
     if not conf:
-        sys.argv = sys.argv[0] + ['harvest'] + sys.argv[1:]
+        sys.argv = [sys.argv[0]] + ['harvest'] + sys.argv[1:]
         return main()
     while True:
         fetch(conf)
@@ -77,6 +77,6 @@ def harvest(conf=None):
 
 def snatch(conf=None):
     if not conf:
-        sys.argv = sys.argv[0] + ['snatch'] + sys.argv[1:]
+        sys.argv = [sys.argv[0]] + ['snatch'] + sys.argv[1:]
         return main()
     fetch(conf, False)
