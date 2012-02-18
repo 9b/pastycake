@@ -36,7 +36,7 @@ def _fetch_one(generator, path, keywords, storage, store_match):
             L.send('match', generator, storage, match=match.group(),
                     url=full_url, data=data)
             if store_match:
-                storage.save_url(full_url, [(name, text),])
+                storage.save_url(full_url, [(name, text), ])
             # stop after the first match
             break
     if not match and store_match:

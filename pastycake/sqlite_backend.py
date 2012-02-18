@@ -66,7 +66,8 @@ class SqliteBackend(StorageBackend):
 
     def _save_urlmatch(self, urlid, matchid, text):
         curs = self._con.cursor()
-        curs.execute('''INSERT OR IGNORE INTO url_matches(url, matcher, matched)
+        curs.execute('''INSERT OR IGNORE
+                     INTO url_matches(url, matcher, matched)
                      VALUES(?, ?, ?)''', (urlid, matchid, text))
         self._con.commit()
 
