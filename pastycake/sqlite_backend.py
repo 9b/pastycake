@@ -8,40 +8,98 @@ from .storage_backend import StorageBackend
 
 class SqliteBackend(StorageBackend):
     DEFAULT_DB = 'urls.db'
+    _DB_TABLES = '''
+        BEGIN;
+        CREATE TABLE matchers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            match_expression TEXT UNIQUE,
+            enabled BOOL DEFAULT 1
+        );
+        CREATE TABLE urls (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT UNIQUE,
+            viewed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE url_matches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url INTEGER REFERENCES urls(id) ON DELETE RESTRICT,
+            matcher IntegrityError REFERENCES matchers(id) ON DELETE RESTRICT,
+            matched TEXT
+        );
+        COMMIT;
+    '''
 
     def __init__(self, filename=None):
-        #self._visited_urls = set()
         self._con = None
         self._filename = filename or self.DEFAULT_DB
 
+    def _save_url(self, url):
+        try:
+            curs = self._con.cursor()
+            curs.execute('INSERT OR IGNORE INTO urls(url) VALUES(?)', (url,))
+            self._con.commit()
+            res = curs.execute('SELECT id FROM urls WHERE url=?',
+                            (url,)).fetchone()
+            return res[0] if res else None
+        except S.IntegrityError as e:
+            print >> stderr, 'save url: %s' % e
+            return None
+        except S.Error as e:
+            print >> stderr, 'save url: %s' % e
+            return None
+
+    def _save_matcher(self, matchname):
+        try:
+            curs = self._con.cursor()
+            curs.execute('''INSERT OR IGNORE INTO matchers(match_expression)
+                         VALUES(?)''', (matchname,))
+            self._con.commit()
+            res = curs.execute('''SELECT id FROM matchers WHERE
+                               match_expression=?''', (matchname,)).fetchone()
+            return res[0] if res else None
+        except S.IntegrityError as e:
+            print >> stderr, 'save matcher: %s' % e
+            return None
+        except S.Error as e:
+            print >> stderr, 'save matcher: %s' % e
+            return None
+
+    def _save_urlmatch(self, urlid, matchid, text):
+        curs = self._con.cursor()
+        curs.execute('''INSERT OR IGNORE
+                     INTO url_matches(url, matcher, matched)
+                     VALUES(?, ?, ?)''', (urlid, matchid, text))
+        self._con.commit()
+
     def already_visited_url(self, url):
-        #if url not in self._visited_urls:
         try:
             curs = self._con.cursor()
             res = curs.execute('SELECT * FROM urls WHERE url=?',
                                 (url,))
             val = res.fetchone()
             return bool(val)
-            #if val:
-            #    self._visited_urls.add(val)
         except S.Error as e:
             print >> stderr, "failed to check url: %s" % e
             return False
-        #return url in self._visited_urls
 
-    def save_url(self, url, match_text=None):
-        match_text = match_text or ''
+    def save_url(self, url, matches=None):
         try:
-            curs = self._con.cursor()
-            curs.execute('INSERT INTO urls(url, matcher) VALUES(?, ?)',
-                        (url, match_text))
-            self._con.commit()
-            #self._visited_urls.add(url)
+            url_id = self._save_url(url)
+            if not url_id:
+                raise RuntimeError('failed to save or read url id (%s)' %
+                                       url)
+            if matches:
+                for name, text in matches:
+                    match_id = self._save_matcher(name)
+                    if match_id:
+                        self._save_urlmatch(url_id, match_id, text)
+
         except S.IntegrityError as e:
             print >> stderr, "issue 12 on github %r %s" % (url, e)
             traceback.print_exc(file=stderr)
         except S.Error as e:
             print >> stderr, "failed to save url: %s" % e
+            raise
             return False
 
         return True
@@ -58,18 +116,8 @@ class SqliteBackend(StorageBackend):
         return bool(self._con)
 
     def _create_tables(self):
-        _URL_TABLE = '''
-        CREATE TABLE urls (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT UNIQUE,
-            matcher TEXT,
-            viewed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        '''
-
         try:
-            curs = self._con.cursor()
-            curs.execute(_URL_TABLE)
+            self._con.executescript(self._DB_TABLES)
             self._con.commit()
         except S.OperationalError:
             #table already exists or we failed to lock the db

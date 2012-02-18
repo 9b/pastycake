@@ -20,18 +20,23 @@ def _fetch_one(generator, path, keywords, storage, store_match):
 
     full_url = generator.full_url(path)
     match = None
+    text = None
+    name = None
 
     for kw in keywords:
         if hasattr(kw, '__call__'):
-            match = kw(data)
+            text = kw(data)
+            name = getattr(kw, '__name__')
         else:
             match = re.search(kw, data)
+            name = kw
+            text = match.group() if match else None
 
         if match:
             L.send('match', generator, storage, match=match.group(),
                     url=full_url, data=data)
             if store_match:
-                storage.save_url(full_url, match.group())
+                storage.save_url(full_url, [(name, text), ])
             # stop after the first match
             break
     if not match and store_match:
