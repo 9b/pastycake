@@ -34,3 +34,7 @@ Except for the above Python 3 compatibility issue, the install is fairly easy::
 
   python setup.py sdist
   pip install dist/pastycake-<version>.tar.gz
+
+or simply::
+
+  python setup.py install
