@@ -1,9 +1,10 @@
 from sys import version_info
 
-from distutils.core import setup
+from setuptools import setup
 
 
 _ALWAYS_REQUIRED_PACKS = [
+    'distribute',
     'httplib2',
     'Louie',
     'lxml',
@@ -65,7 +66,7 @@ setup(
     },
     name='pastycake',
     packages=['pastycake'],
-    requires=_required_packages(),
+    install_requires=_required_packages(),
     url='http://www.gihub.com/9b/pastycake',
     use_2to3=True,
     version='0.1',
