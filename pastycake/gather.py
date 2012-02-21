@@ -6,6 +6,7 @@ import time
 import louie as L
 
 from pastycake.config import Config
+from pastycake.keywords import KeywordStorage
 
 
 def _fetch_one(generator, path, keywords, storage, store_match):
@@ -51,6 +52,9 @@ def fetch(conf_obj, store_match=True):
     for src in conf_obj['sources']:
         for generator, path in src.new_urls(storage):
             _fetch_one(generator, path, keywords, storage, store_match)
+
+    if isinstance(storage, KeywordStorage):
+        conf_obj['keywords'] = storage.current_keywords
 
 
 def main(args=None):

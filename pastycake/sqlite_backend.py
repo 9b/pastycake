@@ -4,9 +4,10 @@ import traceback
 from sys import stderr
 
 from .storage_backend import StorageBackend
+from .keywords import KeywordStorage
 
 
-class SqliteBackend(StorageBackend):
+class SqliteBackend(StorageBackend, KeywordStorage):
     DEFAULT_DB = 'urls.db'
     _DB_TABLES = '''
         BEGIN;
@@ -122,3 +123,34 @@ class SqliteBackend(StorageBackend):
         except S.OperationalError:
             #table already exists or we failed to lock the db
             pass
+
+    # KeywordStorage implementation
+    def _set_keyword_status(self, kwid, boolean):
+        c = self._con.cursor()
+        c.execute('UPDATE matchers SET enabled=? WHERE id=?', (boolean, kwid))
+        self._con.commit()
+
+    def enable_keyword(self, kw):
+        kw_id = self._save_matcher(kw)
+        self._set_keyword_status(kw_id, True)
+
+    def disable_keyword(self, kw):
+        kw_id = self._save_matcher(kw)
+        self._set_keyword_status(kw_id, False)
+
+    @property
+    def available_keywords(self):
+        c = self._con.cursor()
+        return [_[0] for _ in
+                    c.execute('SELECT match_expression FROM matchers'
+                             ).fetchall()
+               ]
+
+    @property
+    def current_keywords(self):
+        c = self._con.cursor()
+        return [_[0] for _ in c.execute(
+                    'SELECT match_expression FROM matchers WHERE enabled=?',
+                    (True,)
+                ).fetchall()
+                ]
