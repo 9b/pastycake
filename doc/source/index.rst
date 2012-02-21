@@ -13,6 +13,7 @@ Contents:
 
    intro
    install
+   features/index
    extending
 
 

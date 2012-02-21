@@ -47,3 +47,8 @@ combine the above steps with the following:
 
   * also add ``from keywords import KeywordStorage``
   * also inherit from ``KeywordStorage``
+  * also implement all methods/params of the ``KeywordStorage`` abc.
+.. important::
+
+    You have to re-decorate the ``@abc.abstractproperty`` methods with
+    ``@property``
