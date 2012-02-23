@@ -8,13 +8,22 @@ Supported Pastes
 * pastebin.com
 * pastie.org
 
+License
+=======
+`3-Clause "New" BSD License`__ , see the file LICENSE.rst for details.
+
+.. __: http://www.opensource.org/licenses/BSD-3-Clause
+
 Files
 =====
-* snatch.py - outputs to the screen and uses the tracker .txt file to monitor previously seen URLs
-* harvest.py - stores data inside of SQLite instead of a text file
+* ``pastycake-snatch.py`` -
+  outputs to the command line and uses the ``tracker.txt`` file to monitor
+  previously seen URLs
+* ``pastycake-harvest.py`` -
+  stores data inside of SQLite instead of a text file
 
 Plans
 =====
-* Create easy way to add in keywords
+* Create easy way to add in keywords (done)
 * Replace nesting with generators (done)
-* Add in emailer
+* Add in emailer (done)
