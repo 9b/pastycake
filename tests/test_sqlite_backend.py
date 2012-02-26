@@ -32,10 +32,10 @@ class TestSqliteBackend(TestCase):
         self.db.connect()
         self.db.enable_keyword('foobar')
         self.db.disable_keyword('zoo')
-        self.assertEqual([u'foobar', u'zoo'],
+        self.assertEqual(['foobar', 'zoo'],
                          self.db.available_keywords)
-        self.assertEqual([u'foobar'], self.db.current_keywords)
+        self.assertEqual(['foobar'], self.db.current_keywords)
         self.assertEqual(self.db.enabled_keywords, self.db.current_keywords)
         self.db.enable_keyword('zoo')
         self.db.disable_keyword('foobar')
-        self.assertEqual([u'zoo'], self.db.enabled_keywords)
+        self.assertEqual(['zoo'], self.db.enabled_keywords)
