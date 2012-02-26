@@ -14,8 +14,10 @@ class PastebinSource(PasteSource):
     def new_urls(self, backend):
         doc = parse('http://pastebin.com/archive').getroot()
 
-        for link in doc.cssselect('td.icon a'):
+        for link in doc.cssselect('.maintable tr td a'):
             app = link.get('href')
+            if app.startswith('/archive/'):
+                continue
             if not backend.already_visited_url(self.full_url(app)):
                 yield self, app
 
