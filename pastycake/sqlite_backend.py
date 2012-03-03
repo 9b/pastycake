@@ -10,7 +10,6 @@ from .keywords import KeywordStorage
 class SqliteBackend(StorageBackend, KeywordStorage):
     DEFAULT_DB = 'urls.db'
     _DB_TABLES = '''
-        BEGIN;
         CREATE TABLE matchers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             match_expression TEXT UNIQUE,
@@ -24,10 +23,9 @@ class SqliteBackend(StorageBackend, KeywordStorage):
         CREATE TABLE url_matches (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url INTEGER REFERENCES urls(id) ON DELETE RESTRICT,
-            matcher IntegrityError REFERENCES matchers(id) ON DELETE RESTRICT,
+            matcher REFERENCES matchers(id) ON DELETE RESTRICT,
             matched TEXT
         );
-        COMMIT;
     '''
 
     def __init__(self, filename=None):
