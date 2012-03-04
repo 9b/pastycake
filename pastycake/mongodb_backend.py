@@ -15,11 +15,9 @@ class MongoBackend(StorageBackend):
     DEFAULT_PORT = 27017
     DEFAULT_DB = 'pastycake'
 
-    def __init__(self, db_name=DEFAULT_DB, host=DEFAULT_HOST,
-                 port=DEFAULT_PORT):
-        self._db_name = db_name
-        self._host = host
-        self._port = port
+    def __init__(self, kwargs):
+        self._mongo_kwargs = kwargs
+        self._db_name = kwargs.get('db_name', self.DEFAULT_DB)
         self._connected = False
 
     def already_visited_url(self, url):
@@ -48,7 +46,7 @@ class MongoBackend(StorageBackend):
 
     def connect(self):
         try:
-            self._con = M.Connection(self._host, self._port)
+            self._con = M.Connection(**self._mongo_kwargs)
             self._db = self._con[self._db_name]
             self._connected = True
         except M.errors.PyMongoError as e:

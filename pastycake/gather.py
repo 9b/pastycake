@@ -74,8 +74,10 @@ def main(args=None):
     conf['backend'] = _backend_or_exit(conf['backend'])
 
     backend = conf['backend']
-    for _ in conf['keywords']:
-        backend.enable_keyword(_ if not hasattr(_, '__call__') else _.__name__)
+    if isinstance(backend, KeywordStorage):
+        for _ in conf['keywords']:
+            backend.enable_keyword(_ if not hasattr(_, '__call__')
+                                   else _.__name__)
     conf['modefunc'](conf)
 
 
