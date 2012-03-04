@@ -27,8 +27,8 @@ def load_ep_object(epname, section_name=None):
         try:
             return load_entry_point(package, section_name, epname)
         except ImportError as e:
-            print >> sys.stderr, 'failed to load entry point %s: %s' % (epname,
-                                                                        e)
+            #print >> sys.stderr, 'failed to load entry point %s: %s' % (
+            #                                                       epname, e)
             return None
 
     if not section_name:
