@@ -6,6 +6,11 @@ Installation of pastycake is not (yet) totally straight forward.
 Requirements
 ------------
 
+.. important::
+
+    At least lxml requires the python development files (headers) as well as
+    a C compiler to be present.
+
 Required packages, besides Python ..math:`>= 2.6`, are:
 
   * Louie
